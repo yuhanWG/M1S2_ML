@@ -1,10 +1,43 @@
 import numpy as np
 from collections import Counter
 import pickle
+import math
+
 try:
     import pydot  #pour l'affichage graphique d'arbres
 except ImportError:
     print("Pydot non disponible pour l'affichage graphique, allez sur http://www.webgraphviz.com/ pour generer un apercu de l'arbre")
+
+##fonctions fournies###
+def splitBase(prc1,datax,datay):
+    label=np.arange(datax.shape[0])
+    np.random.shuffle(label)
+    len1=int(math.ceil(datax.shape[0]*prc1))
+    train=label[:len1]
+    test=label[len1:]
+    return datax[train],datax[test],datay[train],datay[test]
+
+
+def validation_croise(datax,datay,n):
+    score=[]
+    for i in range(n):
+        label=np.arange(datax.shape[0])
+        np.random.shuffle(label)
+        nb_test=int(math.ceil(len(label)/n))
+        test=label[:nb_test]
+        train=label[nb_test:]
+        testx=datax[test]
+        testy=datay[test]
+        trainx=datax[train]
+        trainy=datay[train]
+            
+        dt = DecisionTree ()
+        dt.max_depth = 5
+        dt.min_samples_split = 2
+    
+        dt.fit(trainx,trainy)
+        score.append(dt.score(testx,testy))
+    return np.array(score).mean()
 
 ###############################
 # Fonctions auxiliaires
@@ -195,6 +228,7 @@ class DecisionTree(Classifier):
 
     def predict(self,data):
         return self.root.predict(data)
+
 
     def __str__(self):
         return self.print_tree()
